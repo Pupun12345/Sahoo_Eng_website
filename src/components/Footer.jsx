@@ -74,13 +74,12 @@ function Footer() {
               <div className="flex items-start gap-3 text-gray-300 drop-shadow-md text-sm sm:text-base">
                 <FaPhone className="text-primary mt-1 flex-shrink-0" />
                 <div>
-                  <p>+91 9876543210</p>
-                  <p>+91 9875659459</p>
+                  <p>+91 9777816655</p>
                 </div>
               </div>
               <div className="flex items-start gap-3 text-gray-300 drop-shadow-md text-sm sm:text-base">
                 <FaEnvelope className="text-primary mt-1 flex-shrink-0" />
-                <p className="break-words">info@sahooengineering.com</p>
+                <p className="break-words">www.sahooengineering@gmail.com</p>
               </div>
               <div className="flex items-start gap-3 text-gray-300 drop-shadow-md text-sm sm:text-base">
                 <FaMapMarkerAlt className="text-primary mt-1 flex-shrink-0" />
