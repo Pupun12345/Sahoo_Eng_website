@@ -79,7 +79,7 @@ function Hero({ navigate }) {
                 transition={{ delay: 0.8 }}
                 className="flex gap-4 sm:gap-6 md:gap-8 mt-8 sm:mt-12"
               >
-                {[{ num: "150+", label: "Projects" }, { num: "25+", label: "Years" }, { num: "100%", label: "Safety" }].map((stat, i) => (
+                {[{ num: "50+", label: "Projects" }, { num: "8+", label: "Years" }, { num: "100%", label: "Safety" }].map((stat, i) => (
                   <motion.div
                     key={i}
                     initial={{ scale: 0 }}
