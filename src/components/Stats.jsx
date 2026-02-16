@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 
 function Stats({ navigate }) {
   const stats = [
-    { end: 150, suffix: "+", label: "Projects Completed", icon: "🏗️" },
+    { end: 50, suffix: "+", label: "Projects Completed", icon: "🏗️" },
     { end: 12, suffix: "m", label: "Max Excavation Depth", icon: "⛏️" },
     { end: 100, suffix: "%", label: "Safety Record", icon: "🛡️" },
-    { end: 10, suffix: "+", label: "Years Experience", icon: "🎯" }
+    { end: 8, suffix: "+", label: "Years Experience", icon: "🎯" }
   ];
 
   const Counter = ({ end, suffix, index }) => {
