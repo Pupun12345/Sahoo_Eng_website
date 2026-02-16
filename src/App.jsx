@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Footer from "./components/Footer";
@@ -12,6 +12,7 @@ const ContactPage = lazy(() => import("./pages/ContactPage"));
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [serviceId, setServiceId] = useState('');
+  const [activeSection, setActiveSection] = useState('');
 
   const navigate = (page, id = '') => {
     setCurrentPage(page);
@@ -20,10 +21,57 @@ function App() {
       setTimeout(() => {
         document.getElementById('managingdirector')?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
+    } else if (page === 'home' && id) {
+      // Scroll to section on home page
+      setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
     } else {
       window.scrollTo(0, 0);
     }
   };
+
+  // Scroll tracking for home page
+  useEffect(() => {
+    if (currentPage !== 'home') {
+      return;
+    }
+
+    const sections = ['services', 'managingdirector', 'projects', 'about', 'contact'];
+    
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20% 0px -60% 0px',
+      threshold: 0
+    };
+
+    const observerCallback = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    sections.forEach((sectionId) => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    return () => {
+      sections.forEach((sectionId) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          observer.unobserve(element);
+        }
+      });
+      setActiveSection('');
+    };
+  }, [currentPage]);
 
   const renderPage = () => {
     const LoadingSpinner = () => (
@@ -53,7 +101,7 @@ function App() {
 
   return (
     <>
-      <Navbar navigate={navigate} />
+      <Navbar navigate={navigate} currentPage={currentPage} activeSection={activeSection} />
       {renderPage()}
       {currentPage === 'home' && <Footer />}
     </>

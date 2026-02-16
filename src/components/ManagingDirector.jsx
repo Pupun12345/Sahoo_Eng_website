@@ -15,7 +15,7 @@ function ManagingDirector() {
   ];
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-br from-dark via-gray-900 to-black relative overflow-hidden">
+    <section id="managingdirector" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-br from-dark via-gray-900 to-black relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

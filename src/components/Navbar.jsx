@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 
-function Navbar({ navigate }) {
+function Navbar({ navigate, currentPage, activeSection }) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -14,12 +14,35 @@ function Navbar({ navigate }) {
   }
 
   const menuItems = [
-    { name: "Services", href: "services" },
-    { name: "Leadership", href: "about", id: "managingdirector" },
-    { name: "Projects", href: "projects" },
-    { name: "About", href: "about" },
-    { name: "Contact", href: "contact" }
+    { name: "Services", href: "services", sectionId: "services" },
+    { name: "Leadership", href: "about", id: "managingdirector", sectionId: "managingdirector" },
+    { name: "Projects", href: "projects", sectionId: "projects" },
+    { name: "About", href: "about", sectionId: "about" },
+    { name: "Contact", href: "contact", sectionId: "contact" }
   ];
+
+  const isActive = (item) => {
+    if (currentPage === 'home' && item.sectionId) {
+      return activeSection === item.sectionId;
+    }
+    if (currentPage === item.href && !item.id) {
+      return true;
+    }
+    return false;
+  };
+
+  const handleNavClick = (item) => {
+    if (currentPage === 'home' && item.sectionId) {
+      // On home page, scroll to section
+      navigate('home', item.sectionId);
+    } else if (item.id) {
+      // Navigate to different page with section
+      navigate(item.href, item.id);
+    } else {
+      // Navigate to page
+      navigate(item.href);
+    }
+  };
 
   return (
     <motion.nav
@@ -44,13 +67,17 @@ function Navbar({ navigate }) {
             {menuItems.map((item, index) => (
               <motion.a
                 key={index}
-                onClick={() => item.id ? navigate(item.href, item.id) : navigate(item.href)}
+                onClick={() => handleNavClick(item)}
                 whileHover={{ scale: 1.1, color: "#FFA500" }}
-                className="text-white font-semibold hover:text-primary transition-colors relative group drop-shadow-md text-sm lg:text-base cursor-pointer"
+                className={`font-semibold hover:text-primary transition-colors relative group drop-shadow-md text-sm lg:text-base cursor-pointer ${
+                  isActive(item) ? 'text-primary' : 'text-white'
+                }`}
               >
                 {item.name}
                 <motion.span
-                  className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-orange group-hover:w-full transition-all duration-300"
+                  className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-orange transition-all duration-300 ${
+                    isActive(item) ? 'w-full' : 'w-0 group-hover:w-full'
+                  }`}
                 ></motion.span>
               </motion.a>
             ))}
@@ -88,13 +115,18 @@ function Navbar({ navigate }) {
             {menuItems.map((item, index) => (
               <motion.a
                 key={index}
-                onClick={() => { setIsOpen(false); item.id ? navigate(item.href, item.id) : navigate(item.href); }}
+                onClick={() => { setIsOpen(false); handleNavClick(item); }}
                 initial={{ x: -50, opacity: 0 }}
                 animate={{ x: isOpen ? 0 : -50, opacity: isOpen ? 1 : 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="block text-white font-semibold hover:text-primary transition-colors py-2 drop-shadow-md text-base cursor-pointer"
+                className={`block font-semibold hover:text-primary transition-colors py-2 drop-shadow-md text-base cursor-pointer relative ${
+                  isActive(item) ? 'text-primary' : 'text-white'
+                }`}
               >
                 {item.name}
+                {isActive(item) && (
+                  <span className="absolute bottom-0 left-0 w-12 h-0.5 bg-gradient-orange"></span>
+                )}
               </motion.a>
             ))}
             <motion.button
