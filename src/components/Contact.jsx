@@ -1,9 +1,87 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaWhatsapp } from "react-icons/fa";
+import emailjs from '@emailjs/browser';
+import { EMAILJS_CONFIG } from '../emailConfig';
 
 function Contact() {
   const [formData, setFormData] = useState({ name: '', phone: '', email: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Validation
+    if (!formData.name || !formData.phone || !formData.message) {
+      setSubmitStatus({
+        type: 'error',
+        message: 'Please fill in all required fields (Name, Phone, Message)'
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitStatus({ type: '', message: '' });
+
+    try {
+      // EmailJS Configuration
+      const { serviceId, templateId, publicKey } = EMAILJS_CONFIG;
+
+      console.log('Attempting to send email with config:', {
+        serviceId,
+        templateId,
+        publicKey: publicKey.substring(0, 5) + '...' // Show only first 5 chars for security
+      });
+
+      const templateParams = {
+        from_name: formData.name,
+        from_phone: formData.phone,
+        from_email: formData.email || 'No email provided',
+        message: formData.message,
+        to_email: 'jishanbusiness099@gmail.com'
+      };
+
+      console.log('Template params:', templateParams);
+
+      const response = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      
+      console.log('Email sent successfully:', response);
+
+      setSubmitStatus({
+        type: 'success',
+        message: 'Thank you! Your inquiry has been sent successfully. We will contact you soon.'
+      });
+      
+      // Reset form
+      setFormData({ name: '', phone: '', email: '', message: '' });
+      
+    } catch (error) {
+      console.error('Email send error details:', {
+        message: error.message,
+        text: error.text,
+        status: error.status,
+        error: error
+      });
+      
+      let errorMessage = 'Failed to send inquiry. ';
+      
+      if (error.text) {
+        errorMessage += `Error: ${error.text}`;
+      } else if (error.message) {
+        errorMessage += `Error: ${error.message}`;
+      } else {
+        errorMessage += 'Please try calling us directly or try again later.';
+      }
+      
+      setSubmitStatus({
+        type: 'error',
+        message: errorMessage
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <section id="contact" className="relative py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden">
@@ -40,7 +118,22 @@ function Contact() {
             className="relative"
           >
             <div className="glass-effect p-6 sm:p-8 rounded-3xl border-2 border-primary/20 shadow-2xl">
-              <form className="space-y-4 sm:space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                {/* Status Message */}
+                {submitStatus.message && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`p-4 rounded-xl ${
+                      submitStatus.type === 'success' 
+                        ? 'bg-green-500/20 border-2 border-green-500 text-green-300' 
+                        : 'bg-red-500/20 border-2 border-red-500 text-red-300'
+                    }`}
+                  >
+                    {submitStatus.message}
+                  </motion.div>
+                )}
+
                 <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
                     <label className="block text-white mb-2 font-semibold text-xs sm:text-sm">Full Name *</label>
@@ -91,20 +184,25 @@ function Contact() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
-                  className="w-full bg-gradient-orange text-white px-6 sm:px-8 py-4 sm:py-5 font-bold rounded-xl transition-all shadow-2xl text-sm sm:text-base cursor-pointer"
+                  disabled={isSubmitting}
+                  className={`w-full bg-gradient-orange text-white px-6 sm:px-8 py-4 sm:py-5 font-bold rounded-xl transition-all shadow-2xl text-sm sm:text-base ${
+                    isSubmitting ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
+                  }`}
                 >
                   <span className="flex items-center justify-center gap-2">
-                    Send Inquiry
-                    <motion.svg 
-                      animate={{ x: [0, 5, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                      className="w-4 h-4 sm:w-5 sm:h-5" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </motion.svg>
+                    {isSubmitting ? 'Sending...' : 'Send Inquiry'}
+                    {!isSubmitting && (
+                      <motion.svg 
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                        className="w-4 h-4 sm:w-5 sm:h-5" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </motion.svg>
+                    )}
                   </span>
                 </motion.button>
               </form>
